@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Pro-BGUT</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      background: #1b120b;
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .stage-viewport {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      background: #2b1d12;
+    }
+
+    .scene-bg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Сюжетный блок / подсказка внизу экрана */
+    .story-popup {
+      position: absolute;
+      left: 50%;
+      bottom: max(14px, 3.5%);
+      transform: translateX(-50%);
+      width: min(880px, 92%);
+      background: rgba(255, 249, 238, 0.95);
+      border: 3px solid #c4884c;
+      border-radius: 14px;
+      padding: 16px 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      animation: storyRise 0.35s ease-out;
+    }
+
+    .story-popup.column-mode {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+    }
+
+    @keyframes storyRise {
+      from {
+        opacity: 0;
+        transform: translate(-50%, 20px);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+    }
+
+    .story-header-flex {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      width: 100%;
+    }
+
+    .story-text h2 {
+      font-size: 1.25rem;
+      color: #4d290e;
+      margin-bottom: 4px;
+    }
+
+    .story-text p {
+      font-size: 0.98rem;
+      line-height: 1.45;
+      color: #2c1a0c;
+    }
+
+    .story-text p.large-banner-text {
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: #4d290e;
+      letter-spacing: 0.3px;
+    }
+
+    .btn {
+      background: #d96b27;
+      color: #fff;
+      border: none;
+      padding: 11px 22px;
+      border-radius: 10px;
+      font-size: 0.98rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 4px 0 #8f3d0c;
+      transition: transform 0.12s ease, background 0.2s ease;
+      touch-action: manipulation;
+    }
+
+    .btn-hold {
+      touch-action: none;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: #b85316;
+      transform: translateY(-1px);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #8f3d0c;
+    }
+
+    .btn:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+    }
+
+    .btn-green {
+      background: #2e8b57;
+      box-shadow: 0 4px 0 #1c5937;
+    }
+
+    .btn-green:hover:not(:disabled) {
+      background: #247045;
+    }
+
+    .btn-step3 {
+      background: #1d6fa5;
+      box-shadow: 0 4px 0 #0d3552;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-step3:hover:not(:disabled) {
+      background: #175a87;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Интерактивные маркеры на сцене */
+    .hotspot {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      z-index: 15;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      animation: pulseSpot 2s infinite ease-in-out;
+    }
+
+    .hotspot-ring {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(245, 185, 66, 0.35);
+      border: 3px solid #fff;
+      box-shadow: 0 0 18px #f5b942;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.45rem;
+    }
+
+    .hotspot-label {
+      background: rgba(35, 23, 14, 0.9);
+      color: #fff8ee;
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border: 1px solid #f5b942;
+      white-space: nowrap;
+    }
+
+    @keyframes pulseSpot {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -54%) scale(1.06); }
+    }
+
+    /* Полупрозрачные модальные окна */
+    .modal-layer {
+      position: absolute;
+      inset: 0;
+      background: rgba(20, 12, 6, 0.32);
+      backdrop-filter: blur(1.5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      z-index: 25;
+    }
+
+    .modal-card {
+      background: rgba(255, 249, 238, 0.96);
+      border: 3px solid #c4884c;
+      border-radius: 16px;
+      max-width: 880px;
+      width: 100%;
+      max-height: 92dvh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 20px 24px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-card h2 {
+      color: #4d290e;
+      margin-bottom: 8px;
+      font-size: 1.32rem;
+    }
+
+    .modal-card p {
+      color: #2c1a0c;
+      line-height: 1.45;
+      margin-bottom: 12px;
+      font-size: 0.96rem;
+    }
+
+    /* Взвешивание с удержанием */
+    .weigh-layout {
+      display: grid;
+      grid-template-columns: 0.95fr 1.15fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .ing-select-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .ing-choice {
+      background: rgba(255, 255, 255, 0.92);
+      border: 2px solid #c4884c;
+      border-radius: 10px;
+      padding: 10px 14px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 0.96rem;
+      font-weight: 700;
+      color: #2c1a0c;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+
+    .ing-choice:hover:not(.in-bowl) {
+      background: #ffefd6;
+    }
+
+    .ing-choice.selected {
+      border-color: #d96b27;
+      background: #ffe4be;
+      box-shadow: 0 0 0 2px rgba(217, 107, 39, 0.25);
+    }
+
+    .ing-choice.in-bowl {
+      background: #e2f6ea;
+      border-color: #2e8b57;
+      color: #1c5937;
+      cursor: default;
+    }
+
+    .weigh-station {
+      background: rgba(255, 253, 247, 0.92);
+      border: 2px solid #d4ae81;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .scale-digital {
+      background: #24160b;
+      color: #7dff9b;
+      font-family: monospace;
+      font-size: 1.6rem;
+      font-weight: 700;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+
+    .dose-bar-wrap {
+      position: relative;
+      height: 24px;
+      background: #e6d5be;
+      border-radius: 12px;
+      border: 2px solid #9c6c3c;
+      overflow: hidden;
+      margin: 10px 0 14px;
+    }
+
+    .dose-fill {
+      height: 100%;
+      width: 0%;
+      background: #d96b27;
+      transition: width 0.03s linear;
+    }
+
+    .bowl-summary {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid #e2cbb0;
+      font-size: 0.9rem;
+      color: #4d290e;
+      font-weight: 600;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 22px;
+      background: #e5d1b8;
+      border-radius: 11px;
+      overflow: hidden;
+      border: 2px solid #9e6c3b;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #d96b27, #2e8b57);
+      transition: width 0.2s ease;
+    }
+
+    .knead-bottom-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .proof-ready-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 4px;
+    }
+
+    .circuit-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .circuit-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 56px);
+      gap: 6px;
+      background: #2b3036;
+      padding: 12px;
+      border-radius: 12px;
+      border: 3px solid #59626d;
+      margin: 8px auto;
+      width: fit-content;
+    }
+
+    .tile {
+      width: 56px;
+      height: 56px;
+      background: #3d444d;
+      border-radius: 8px;
+      border: 2px solid #5a636e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .tile.powered {
+      background: #244736;
+      border-color: #4cd98b;
+    }
+
+    .tile.fixed {
+      border-color: #f5b942;
+      cursor: default;
+    }
+
+    .econ-grid {
+      display: grid;
+      grid-template-columns: 0.82fr 1.18fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .pricelist-box {
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #c4884c;
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .table-scroll {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .excel-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      font-size: 0.88rem;
+      min-width: 310px;
+    }
+
+    .excel-table th {
+      background: #217346;
+      color: #fff;
+      padding: 6px 8px;
+      border: 1px solid #185433;
+      text-align: left;
+    }
+
+    .excel-table td {
+      padding: 5px 8px;
+      border: 1px solid #ccc;
+    }
+
+    .price-input {
+      width: 76px;
+      padding: 5px 6px;
+      border: 2px solid #217346;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      background: #f0fff6;
+    }
+
+    .price-input.ok-field {
+      border-color: #2e8b57;
+      background: #e3f7eb;
+    }
+
+    .price-input.err-field {
+      border-color: #c94a2b;
+      background: #fff1ee;
+    }
+
+    .victory-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 780px) {
+      .weigh-layout,
+      .econ-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .story-popup {
+        width: 94%;
+        padding: 13px 15px;
+        bottom: max(10px, 2.5%);
+        gap: 12px;
+      }
+
+      .story-header-flex {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+        gap: 12px;
+      }
+
+      .story-text h2 {
+        font-size: 1.1rem;
+      }
+
+      .story-text p {
+        font-size: 0.9rem;
+      }
+
+      .story-text p.large-banner-text {
+        font-size: 1.25rem;
+      }
+
+      .modal-card {
+        padding: 15px 14px;
+        border-radius: 14px;
+      }
+
+      .modal-card h2 {
+        font-size: 1.15rem;
+      }
+
+      .btn {
+        width: 100%;
+        padding: 10px 16px;
+        font-size: 0.92rem;
+      }
+
+      .weigh-station .btn {
+        width: auto;
+        flex: 1 1 auto;
+      }
+
+      .knead-bottom-row,
+      .proof-ready-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+
+      #knead-percent {
+        text-align: center !important;
+      }
+
+      .circuit-grid {
+        grid-template-columns: repeat(5, 46px);
+        gap: 4px;
+        padding: 8px;
+      }
+
+      .tile {
+        width: 46px;
+        height: 46px;
+      }
+
+      .tile svg {
+        width: 38px !important;
+        height: 38px !important;
+      }
+
+      .hotspot-ring {
+        width: 48px;
+        height: 48px;
+        font-size: 1.25rem;
+      }
+
+      .hotspot-label {
+        font-size: 0.78rem;
+        padding: 3px 9px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage-viewport">
+    <img id="scene-image" class="scene-bg" src="assets/01_bg_factory.jpg" alt="Сцена хлебозавода" />
+
+    <!-- Маркер книги на столе -->
+    <div id="hotspot-book" class="hotspot hidden" style="left: 48%; top: 64%;" onclick="triggerBookSequence()">
+      <div class="hotspot-ring">📖</div>
+      <div class="hotspot-label">Книга Рецептовъ</div>
+    </div>
+
+    <!-- Маркер щитка -->
+    <div id="hotspot-panel" class="hotspot hidden" style="left: 24%; top: 68%;" onclick="openEngineerIntro()">
+      <div class="hotspot-ring">⚡</div>
+      <div class="hotspot-label">Щиток управления</div>
+    </div>
+
+    <!-- Маркер кабинета экономиста -->
+    <div id="hotspot-office" class="hotspot hidden" style="left: 52%; top: 68%;" onclick="openEconomistIntro()">
+      <div class="hotspot-ring">📊</div>
+      <div class="hotspot-label">Прайс-лист</div>
+    </div>
+
+    <!-- Всплывающий блок внизу экрана -->
+    <div id="story-popup" class="story-popup">
+      <div id="story-header-row" class="story-header-flex">
+        <div class="story-text">
+          <h2 id="story-title">Формула успеха!</h2>
+          <p id="story-desc">
+            На хлебозаводе запускают новую линию выпечки. Пройди путь Технолога, Инжене́ра и Экономиста,
+            чтобы производство работало без сбоев и приносило прибыль.
+          </p>
+        </div>
+        <button id="story-btn" class="btn" onclick="beginQuest()">Начать квест</button>
+      </div>
+
+      <!-- Нижний блок замеса теста поверх фона 05_kneading_dough.jpg -->
+      <div id="knead-bottom-panel" class="hidden" style="width:100%;">
+        <p id="knead-prompt" style="font-weight:700; color:#2c1a0c; margin-bottom:8px;">
+          Вымешивай тесто до однородной консистенции:
+        </p>
+        <div class="knead-bottom-row">
+          <div class="progress-track" style="flex:1; margin:0;">
+            <div id="knead-fill" class="progress-fill"></div>
+          </div>
+          <span id="knead-percent" style="font-weight:700; min-width:52px; text-align:right;">0%</span>
+          <button id="btn-knead-hit" class="btn" onclick="hitKnead()">Вымешивать</button>
+          <button id="btn-go-proof" class="btn btn-green hidden" onclick="openProofStep()">На расстойку</button>
+        </div>
+      </div>
+
+      <!-- Нижний блок расстойки теста поверх фона 06_proofing_dough.jpg -->
+      <div id="proof-bottom-panel" class="hidden" style="width:100%;">
+        <p style="font-weight:700; color:#2c1a0c; margin-bottom:8px;">
+          Тесто в форме подходит в теплом месте перед выпечкой.
+        </p>
+        <div class="progress-track">
+          <div id="proof-fill" class="progress-fill"></div>
+        </div>
+        <div class="proof-ready-row">
+          <span id="proof-text" style="font-weight:700; color:#4d290e;">Расстойка: 0%</span>
+          <button id="btn-done-tech" class="btn btn-green hidden" onclick="finishTechStage()">
+            Теперь нужно запустить печь
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Полупрозрачное окно взвешивания -->
+    <div id="modal-weighing" class="modal-layer hidden">
+      <div class="modal-card">
+        <h2>⚖️ Взвешивание ингредиентов</h2>
+        <p>
+          Выбери ингредиент из списка, <strong>удерживай кнопку</strong> подачи, отпусти на нужном весе
+          и нажми <strong>«Засыпать в чашу»</strong>.
+        </p>
+
+        <div class="weigh-layout">
+          <div class="ing-select-list">
+            <button class="ing-choice" id="pick-flour" onclick="selectIngredient('flour')">
+              <span>🌾 Мука пшеничная</span>
+              <span id="status-flour">не в чаше</span>
+            </button>
+            <button class="ing-choice" id="pick-water" onclick="selectIngredient('water')">
+              <span>💧 Вода</span>
+              <span id="status-water">не в чаше</span>
+            </button>
+            <button class="ing-choice" id="pick-yeast" onclick="selectIngredient('yeast')">
+              <span>🧫 Дрожжи</span>
+              <span id="status-yeast">не в чаше</span>
+            </button>
+            <button class="ing-choice" id="pick-salt" onclick="selectIngredient('salt')">
+              <span>🧂 Соль</span>
+              <span id="status-salt">не в чаше</span>
+            </button>
+            <button class="ing-choice" id="pick-sugar" onclick="selectIngredient('sugar')">
+              <span>🍬 Сахар</span>
+              <span id="status-sugar">не в чаше</span>
+            </button>
+          </div>
+
+          <div class="weigh-station">
+            <div id="active-ing-label" style="font-weight:700; color:#4d290e; margin-bottom:6px;">
+              Выбери ингредиент слева
+            </div>
+            <div id="scale-readout" class="scale-digital">0 г</div>
+
+            <div class="dose-bar-wrap">
+              <div id="dose-fill" class="dose-fill"></div>
+            </div>
+
+            <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+              <button
+                id="btn-hold-pour"
+                class="btn btn-hold"
+                disabled
+                onpointerdown="startPouring(event)"
+                onpointerup="stopPouring()"
+                onpointerleave="stopPouring()"
+                onpointercancel="stopPouring()"
+              >
+                ✊ Удерживать подачу
+              </button>
+              <button id="btn-reset-dose" class="btn" style="background:#7d5a3c; box-shadow:0 4px 0 #4d3521;" onclick="resetCurrentDose()" disabled>
+                ↺ Сброс
+              </button>
+              <button id="btn-to-bowl" class="btn btn-green" onclick="pourIntoBowl()" disabled>
+                🥣 Засыпать в чашу
+              </button>
+            </div>
+
+            <div class="bowl-summary">
+              В чаше: <span id="bowl-count">0</span> из 5 ингредиентов • Общий вес: <span id="bowl-weight">0</span> г
+            </div>
+
+            <div style="margin-top:12px;">
+              <button id="btn-start-knead" class="btn btn-green hidden" onclick="startKneadPhase()">
+                Замесить тесто
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Этап 2: Щиток управления печи -->
+    <div id="modal-engineer" class="modal-layer hidden">
+      <div class="modal-card" style="text-align:center;">
+        <h2>⚡ Щиток управления печи</h2>
+        <p>Поворачивай плитки с проводами, чтобы соединить <strong>Ввод 380В</strong> слева с <strong>Печью</strong> справа.</p>
+        <div class="circuit-wrapper">
+          <div style="background:#d96b27; color:#fff; padding:8px 12px; border-radius:8px; font-weight:700;">⚡ Ввод 380В</div>
+          <div id="circuit-grid" class="circuit-grid"></div>
+          <div id="badge-oven" style="background:#555; color:#fff; padding:8px 12px; border-radius:8px; font-weight:700;">🔥 Печь</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Расчёт себестоимости -->
+    <div id="modal-econ" class="modal-layer hidden">
+      <div class="modal-card">
+        <h2>💼 Расчёт себестоимости</h2>
+        <p>Возьми из прайс-листа цену за 1 кг и пересчитай затраты на рецепт.</p>
+        <div class="econ-grid">
+          <div class="pricelist-box">
+            <h4 style="text-align:center; margin-bottom:8px; color:#4d290e;">ПРАЙС-ЛИСТ (за 1 кг)</h4>
+            <p style="font-size:0.9rem; margin-bottom:6px;"><strong>Мука пшеничная в/с:</strong> 1.68 руб./кг</p>
+            <p style="font-size:0.9rem; margin-bottom:6px;"><strong>Вода подготовленная:</strong> 0.30 руб./кг</p>
+            <p style="font-size:0.9rem; margin-bottom:6px;"><strong>Дрожжи прессованные:</strong> 9.50 руб./кг</p>
+            <p style="font-size:0.9rem; margin-bottom:6px;"><strong>Соль пищевая:</strong> 0.44 руб./кг</p>
+            <p style="font-size:0.9rem; margin-bottom:0;"><strong>Сахар-песок:</strong> 2.45 руб./кг</p>
+          </div>
+          <div class="table-scroll">
+            <table class="excel-table">
+              <thead>
+                <tr>
+                  <th>Ингредиент</th>
+                  <th>По рецепту</th>
+                  <th>Цена/кг</th>
+                  <th>Сумма</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Мука</strong></td>
+                  <td id="recipe-qty-flour">0.500 кг</td>
+                  <td><input type="number" step="0.01" inputmode="decimal" id="price-flour" class="price-input" placeholder="0.00" oninput="calcEcon()" /></td>
+                  <td id="sum-flour">0.00</td>
+                </tr>
+                <tr>
+                  <td><strong>Вода</strong></td>
+                  <td id="recipe-qty-water">0.300 кг</td>
+                  <td><input type="number" step="0.01" inputmode="decimal" id="price-water" class="price-input" placeholder="0.00" oninput="calcEcon()" /></td>
+                  <td id="sum-water">0.00</td>
+                </tr>
+                <tr>
+                  <td><strong>Дрожжи</strong></td>
+                  <td id="recipe-qty-yeast">0.010 кг</td>
+                  <td><input type="number" step="0.01" inputmode="decimal" id="price-yeast" class="price-input" placeholder="0.00" oninput="calcEcon()" /></td>
+                  <td id="sum-yeast">0.00</td>
+                </tr>
+                <tr>
+                  <td><strong>Соль</strong></td>
+                  <td id="recipe-qty-salt">0.010 кг</td>
+                  <td><input type="number" step="0.01" inputmode="decimal" id="price-salt" class="price-input" placeholder="0.00" oninput="calcEcon()" /></td>
+                  <td id="sum-salt">0.00</td>
+                </tr>
+                <tr>
+                  <td><strong>Сахар</strong></td>
+                  <td id="recipe-qty-sugar">0.010 кг</td>
+                  <td><input type="number" step="0.01" inputmode="decimal" id="price-sugar" class="price-input" placeholder="0.00" oninput="calcEcon()" /></td>
+                  <td id="sum-sugar">0.00</td>
+                </tr>
+                <tr style="background:#e3f7eb; font-weight:700;">
+                  <td colspan="3">Итого себестоимость рецепта:</td>
+                  <td id="total-cost">0.00 руб.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p id="econ-msg" style="margin-top:8px; font-weight:600; font-size:0.9rem; color:#4d290e;">
+              Введи цены за 1 кг для всех пяти ингредиентов из прайс-листа.
+            </p>
+            <div style="text-align:right; margin-top:10px;">
+              <button id="btn-econ-ok" class="btn btn-green" disabled onclick="finishEconStage()">Утвердить расчёт</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Финальный экран -->
+    <div id="modal-victory" class="modal-layer hidden">
+      <div class="modal-card" style="text-align:center; max-width:580px;">
+        <h2>🍞 Миссия успешно завершена!</h2>
+        <p>Хлебозавод работает на полную мощность, новая линия выпечки запущена.</p>
+
+        <div class="victory-actions">
+          <button class="btn" onclick="resetGame()">Пройти заново</button>
+          <a
+            class="btn btn-step3"
+            href="https://nvhol.github.io/Pro-BGUT/testdrive.html"
+            onclick="notifyStep3()"
+          >
+            Перейти на шаг 3
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STEP3_URL = 'https://nvhol.github.io/Pro-BGUT/testdrive.html';
+    const sceneImg = document.getElementById('scene-image');
+    let proofTimer = null;
+    let victoryTimer = null;
+
+    function setScene(path) {
+      sceneImg.src = path;
+    }
+
+    function hideHotspots() {
+      document.querySelectorAll('.hotspot').forEach(el => el.classList.add('hidden'));
+    }
+
+    function hideModals() {
+      document.querySelectorAll('.modal-layer').forEach(el => el.classList.add('hidden'));
+    }
+
+    function showBanner(title, desc, btnText, onClickFn, isLargeDesc = false) {
+      const popup = document.getElementById('story-popup');
+      const headerRow = document.getElementById('story-header-row');
+      const kneadPanel = document.getElementById('knead-bottom-panel');
+      const proofPanel = document.getElementById('proof-bottom-panel');
+
+      popup.classList.remove('column-mode');
+      kneadPanel.classList.add('hidden');
+      proofPanel.classList.add('hidden');
+      headerRow.classList.remove('hidden');
+
+      const titleEl = document.getElementById('story-title');
+      if (title) {
+        titleEl.textContent = title;
+        titleEl.classList.remove('hidden');
+      } else {
+        titleEl.classList.add('hidden');
+      }
+
+      const descEl = document.getElementById('story-desc');
+      descEl.textContent = desc;
+      descEl.classList.toggle('large-banner-text', isLargeDesc);
+
+      const btn = document.getElementById('story-btn');
+      if (btnText) {
+        btn.textContent = btnText;
+        btn.onclick = onClickFn;
+        btn.classList.remove('hidden');
+      } else {
+        btn.classList.add('hidden');
+      }
+      popup.classList.remove('hidden');
+    }
+
+    function showKneadBar() {
+      const popup = document.getElementById('story-popup');
+      const headerRow = document.getElementById('story-header-row');
+      const kneadPanel = document.getElementById('knead-bottom-panel');
+      const proofPanel = document.getElementById('proof-bottom-panel');
+
+      popup.classList.add('column-mode');
+      headerRow.classList.add('hidden');
+      proofPanel.classList.add('hidden');
+      kneadPanel.classList.remove('hidden');
+      popup.classList.remove('hidden');
+    }
+
+    function showProofBar() {
+      const popup = document.getElementById('story-popup');
+      const headerRow = document.getElementById('story-header-row');
+      const kneadPanel = document.getElementById('knead-bottom-panel');
+      const proofPanel = document.getElementById('proof-bottom-panel');
+
+      popup.classList.add('column-mode');
+      headerRow.classList.add('hidden');
+      kneadPanel.classList.add('hidden');
+      proofPanel.classList.remove('hidden');
+      popup.classList.remove('hidden');
+    }
+
+    function hidePopup() {
+      document.getElementById('story-popup').classList.add('hidden');
+    }
+
+    function beginQuest() {
+      hidePopup();
+      setScene('assets/02_table_book_closed.jpg');
+      document.getElementById('hotspot-book').classList.remove('hidden');
+    }
+
+    function triggerBookSequence() {
+      hideHotspots();
+      setScene('assets/03_book_open.jpg');
+      showBanner('', 'Запомни рецепт!', 'Перейти к весам', openWeighingIntro, true);
+    }
+
+    function openWeighingIntro() {
+      hideModals();
+      setScene('assets/04_scales_ingredients.jpg');
+      hidePopup();
+
+      setTimeout(() => {
+        initWeighingModal();
+      }, 1000);
+    }
+
+    const INGREDIENTS = {
+      flour: { label: 'Мука пшеничная', target: 500, unit: 'г', maxScale: 625, speedPerSec: 210, price: 1.68 },
+      water: { label: 'Вода', target: 300, unit: 'мл', maxScale: 375, speedPerSec: 130, price: 0.30 },
+      yeast: { label: 'Дрожжи', target: 10, unit: 'г', maxScale: 12.5, speedPerSec: 4.5, price: 9.50 },
+      salt:  { label: 'Соль', target: 10, unit: 'г', maxScale: 12.5, speedPerSec: 4.5, price: 0.44 },
+      sugar: { label: 'Сахар', target: 10, unit: 'г', maxScale: 12.5, speedPerSec: 4.5, price: 2.45 }
+    };
+
+    let currentIngKey = null;
+    let currentDose = 0;
+    let bowlWeights = {};
+    let pourTimer = null;
+    let lastTick = 0;
+
+    function initWeighingModal() {
+      currentIngKey = null;
+      currentDose = 0;
+      bowlWeights = {};
+
+      Object.keys(INGREDIENTS).forEach(k => {
+        const btn = document.getElementById('pick-' + k);
+        btn.classList.remove('selected', 'in-bowl');
+        document.getElementById('status-' + k).textContent = 'не в чаше';
+      });
+
+      document.getElementById('active-ing-label').textContent = 'Выбери ингредиент слева';
+      document.getElementById('scale-readout').textContent = '0 г';
+      document.getElementById('dose-fill').style.width = '0%';
+      document.getElementById('btn-hold-pour').disabled = true;
+      document.getElementById('btn-reset-dose').disabled = true;
+      document.getElementById('btn-to-bowl').disabled = true;
+      document.getElementById('btn-start-knead').classList.add('hidden');
+      updateBowlSummary();
+
+      document.getElementById('modal-weighing').classList.remove('hidden');
+    }
+
+    function isInTolerance(key, val) {
+      const cfg = INGREDIENTS[key];
+      return val >= cfg.target * 0.98 && val <= cfg.target * 1.02;
+    }
+
+    function selectIngredient(key) {
+      if (bowlWeights[key] !== undefined) return;
+      stopPouring();
+      currentIngKey = key;
+      currentDose = 0;
+
+      Object.keys(INGREDIENTS).forEach(k => {
+        document.getElementById('pick-' + k).classList.toggle('selected', k === key);
+      });
+
+      const cfg = INGREDIENTS[key];
+      document.getElementById('active-ing-label').textContent = `Взвешиваем: ${cfg.label}`;
+      document.getElementById('btn-hold-pour').disabled = false;
+      document.getElementById('btn-reset-dose').disabled = false;
+      document.getElementById('btn-to-bowl').disabled = true;
+      renderDoseVisual();
+    }
+
+    function startPouring(e) {
+      if (!currentIngKey || bowlWeights[currentIngKey] !== undefined) return;
+      if (e) e.preventDefault();
+      stopPouring();
+      lastTick = performance.now();
+
+      pourTimer = setInterval(() => {
+        const now = performance.now();
+        const dt = (now - lastTick) / 1000;
+        lastTick = now;
+
+        const cfg = INGREDIENTS[currentIngKey];
+        currentDose = Math.min(cfg.maxScale, currentDose + cfg.speedPerSec * dt);
+        renderDoseVisual();
+      }, 20);
+    }
+
+    function stopPouring() {
+      if (pourTimer) {
+        clearInterval(pourTimer);
+        pourTimer = null;
+      }
+      if (!currentIngKey) return;
+      const ok = isInTolerance(currentIngKey, currentDose);
+      document.getElementById('btn-to-bowl').disabled = !ok;
+    }
+
+    function resetCurrentDose() {
+      stopPouring();
+      if (!currentIngKey) return;
+      currentDose = 0;
+      document.getElementById('btn-to-bowl').disabled = true;
+      renderDoseVisual();
+    }
+
+    function renderDoseVisual() {
+      if (!currentIngKey) return;
+      const cfg = INGREDIENTS[currentIngKey];
+      const decimals = cfg.target < 50 ? 1 : 0;
+      const readout = document.getElementById('scale-readout');
+      readout.textContent = `${currentDose.toFixed(decimals)} ${cfg.unit}`;
+
+      const pct = Math.min(100, (currentDose / cfg.maxScale) * 100);
+      document.getElementById('dose-fill').style.width = pct + '%';
+    }
+
+    function pourIntoBowl() {
+      if (!currentIngKey || !isInTolerance(currentIngKey, currentDose)) return;
+      stopPouring();
+
+      const cfg = INGREDIENTS[currentIngKey];
+      const val = cfg.target < 50 ? Number(currentDose.toFixed(1)) : Math.round(currentDose);
+      bowlWeights[currentIngKey] = val;
+
+      const btn = document.getElementById('pick-' + currentIngKey);
+      btn.classList.remove('selected');
+      btn.classList.add('in-bowl');
+      document.getElementById('status-' + currentIngKey).textContent = `в чаше (${val} ${cfg.unit})`;
+
+      currentIngKey = null;
+      currentDose = 0;
+      document.getElementById('active-ing-label').textContent = 'Выбери следующий ингредиент слева';
+      document.getElementById('scale-readout').textContent = '0 г';
+      document.getElementById('dose-fill').style.width = '0%';
+      document.getElementById('btn-hold-pour').disabled = true;
+      document.getElementById('btn-reset-dose').disabled = true;
+      document.getElementById('btn-to-bowl').disabled = true;
+
+      updateBowlSummary();
+    }
+
+    function updateBowlSummary() {
+      const keys = Object.keys(bowlWeights);
+      const sum = keys.reduce((acc, k) => acc + bowlWeights[k], 0);
+      document.getElementById('bowl-count').textContent = keys.length;
+      document.getElementById('bowl-weight').textContent = Number.isInteger(sum) ? sum : sum.toFixed(1);
+
+      if (keys.length === 5) {
+        document.getElementById('btn-start-knead').classList.remove('hidden');
+      }
+    }
+
+    let kneadVal = 0;
+
+    function startKneadPhase() {
+      hideModals();
+      setScene('assets/05_kneading_dough.jpg');
+      kneadVal = 0;
+      document.getElementById('knead-fill').style.width = '0%';
+      document.getElementById('knead-percent').textContent = '0%';
+      document.getElementById('btn-knead-hit').classList.remove('hidden');
+      document.getElementById('btn-go-proof').classList.add('hidden');
+      showKneadBar();
+    }
+
+    function hitKnead() {
+      kneadVal = Math.min(100, kneadVal + 20);
+      document.getElementById('knead-fill').style.width = kneadVal + '%';
+      document.getElementById('knead-percent').textContent = kneadVal + '%';
+      if (kneadVal >= 100) {
+        document.getElementById('btn-knead-hit').classList.add('hidden');
+        document.getElementById('btn-go-proof').classList.remove('hidden');
+      }
+    }
+
+    function openProofStep() {
+      if (proofTimer) {
+        clearInterval(proofTimer);
+        proofTimer = null;
+      }
+      hideModals();
+      setScene('assets/06_proofing_dough.jpg');
+      document.getElementById('btn-done-tech').classList.add('hidden');
+      showProofBar();
+
+      let p = 0;
+      const fill = document.getElementById('proof-fill');
+      const txt = document.getElementById('proof-text');
+      fill.style.width = '0%';
+      txt.textContent = 'Расстойка: 0%';
+
+      proofTimer = setInterval(() => {
+        p += 10;
+        fill.style.width = p + '%';
+        txt.textContent = `Расстойка: ${p}%`;
+        if (p >= 100) {
+          clearInterval(proofTimer);
+          proofTimer = null;
+          txt.textContent = 'Тесто готово к выпечке!';
+          document.getElementById('btn-done-tech').classList.remove('hidden');
+        }
+      }, 250);
+    }
+
+    function finishTechStage() {
+      hidePopup();
+      setScene('assets/07_modern_oven_broken.jpg');
+      showBanner(
+        '',
+        'Новая печь установлена, но в щитке управления пропал контакт. Почини цепь, чтобы запустить выпечку.',
+        'К щитку',
+        () => {
+          hidePopup();
+          document.getElementById('hotspot-panel').classList.remove('hidden');
+        }
+      );
+    }
+
+    // Щиток управления печи
+    const INIT_CIRCUIT = [
+      [
+        { type: 'straight', rot: 0, fixed: true },
+        { type: 'corner', rot: 0 },
+        { type: 'corner', rot: 1 },
+        { type: 'straight', rot: 1 },
+        { type: 'corner', rot: 2 }
+      ],
+      [
+        { type: 'corner', rot: 2 },
+        { type: 'corner', rot: 3 },
+        { type: 'straight', rot: 1 },
+        { type: 'corner', rot: 0 },
+        { type: 'straight', rot: 0 }
+      ],
+      [
+        { type: 'straight', rot: 1 },
+        { type: 'corner', rot: 1 },
+        { type: 'corner', rot: 2 },
+        { type: 'straight', rot: 0 },
+        { type: 'corner', rot: 1 }
+      ],
+      [
+        { type: 'corner', rot: 0 },
+        { type: 'straight', rot: 0 },
+        { type: 'corner', rot: 3 },
+        { type: 'corner', rot: 2 },
+        { type: 'straight', rot: 0, fixed: true }
+      ]
+    ];
+
+    let gridData = [];
+
+    function openEngineerIntro() {
+      hideHotspots();
+      hidePopup();
+      setScene('assets/08_panel_closeup.jpg');
+
+      setTimeout(() => {
+        openEngineerModal();
+      }, 1000);
+    }
+
+    function openEngineerModal() {
+      gridData = INIT_CIRCUIT.map(r => r.map(c => ({ ...c })));
+      document.getElementById('badge-oven').style.background = '#555';
+      renderCircuit();
+      document.getElementById('modal-engineer').classList.remove('hidden');
+    }
+
+    function openings(tile) {
+      if (tile.type === 'straight') return tile.rot % 2 === 0 ? [1, 3] : [0, 2];
+      const r = tile.rot % 4;
+      return [r, (r + 1) % 4];
+    }
+
+    function getPowered() {
+      const seen = new Set();
+      const q = [];
+      if (openings(gridData[0][0]).includes(3)) {
+        seen.add('0,0');
+        q.push([0, 0]);
+      }
+      const dirs = [
+        [-1, 0, 0, 2],
+        [0, 1, 1, 3],
+        [1, 0, 2, 0],
+        [0, -1, 3, 1]
+      ];
+      while (q.length) {
+        const [r, c] = q.shift();
+        for (const [dr, dc, outD, inD] of dirs) {
+          if (!openings(gridData[r][c]).includes(outD)) continue;
+          const nr = r + dr, nc = c + dc;
+          if (nr < 0 || nr >= 4 || nc < 0 || nc >= 5) continue;
+          const key = `${nr},${nc}`;
+          if (seen.has(key)) continue;
+          if (openings(gridData[nr][nc]).includes(inD)) {
+            seen.add(key);
+            q.push([nr, nc]);
+          }
+        }
+      }
+      return seen;
+    }
+
+    function renderCircuit() {
+      const el = document.getElementById('circuit-grid');
+      el.innerHTML = '';
+      const powered = getPowered();
+      const solved = powered.has('3,4') && openings(gridData[3][4]).includes(1);
+
+      for (let r = 0; r < 4; r++) {
+        for (let c = 0; c < 5; c++) {
+          const tile = gridData[r][c];
+          const isPow = powered.has(`${r},${c}`);
+          const cell = document.createElement('div');
+          cell.className = 'tile' + (isPow ? ' powered' : '') + (tile.fixed ? ' fixed' : '');
+          const stroke = isPow ? '#4cd98b' : '#e08b44';
+          const deg = (tile.rot % 4) * 90;
+          cell.innerHTML = tile.type === 'straight'
+            ? `<svg width="46" height="46" viewBox="0 0 50 50" style="transform:rotate(${deg}deg)"><line x1="0" y1="25" x2="50" y2="25" stroke="${stroke}" stroke-width="8" stroke-linecap="round"/></svg>`
+            : `<svg width="46" height="46" viewBox="0 0 50 50" style="transform:rotate(${deg}deg)"><path d="M25,0 L25,25 L50,25" fill="none" stroke="${stroke}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+          if (!tile.fixed && !solved) {
+            cell.onclick = () => {
+              tile.rot = (tile.rot + 1) % 4;
+              renderCircuit();
+            };
+          }
+          el.appendChild(cell);
+        }
+      }
+
+      if (solved) {
+        document.getElementById('badge-oven').style.background = '#2e8b57';
+        setTimeout(() => {
+          hideModals();
+          setScene('assets/09_modern_oven_working.jpg');
+          showBanner(
+            'Печь исправна!',
+            'Ароматная свежая выпечка наготове!',
+            'Пора рассчитать себестоимость',
+            finishEngineerStage
+          );
+        }, 450);
+      }
+    }
+
+    function finishEngineerStage() {
+      hideModals();
+      setScene('assets/10_director_office.jpg');
+      showBanner(
+        '',
+        'Печь работает! Теперь в кабинете директора нужно свериться с прайс-листом и рассчитать себестоимость крафтового хлеба.',
+        'Прайс-лист',
+        () => {
+          hidePopup();
+          document.getElementById('hotspot-office').classList.remove('hidden');
+        }
+      );
+    }
+
+    function openEconomistIntro() {
+      hideHotspots();
+      hidePopup();
+      setScene('assets/11_pricelist_closeup.jpg');
+
+      setTimeout(() => {
+        setScene('assets/12_computer_excel.jpg');
+        openEconomistModal();
+      }, 1000);
+    }
+
+    function getRecipeKg(key) {
+      const grams = bowlWeights[key] !== undefined ? bowlWeights[key] : INGREDIENTS[key].target;
+      return grams / 1000;
+    }
+
+    function openEconomistModal() {
+      Object.keys(INGREDIENTS).forEach(k => {
+        const kg = getRecipeKg(k);
+        document.getElementById('recipe-qty-' + k).textContent = kg.toFixed(3) + ' кг';
+        const inp = document.getElementById('price-' + k);
+        inp.value = '';
+        inp.classList.remove('ok-field', 'err-field');
+        document.getElementById('sum-' + k).textContent = '0.00';
+      });
+      document.getElementById('total-cost').textContent = '0.00 руб.';
+      document.getElementById('econ-msg').textContent = 'Введи цены за 1 кг для всех пяти ингредиентов из прайс-листа.';
+      document.getElementById('btn-econ-ok').disabled = true;
+      document.getElementById('modal-econ').classList.remove('hidden');
+    }
+
+    function calcEcon() {
+      let total = 0;
+      let filledCount = 0;
+      let allCorrect = true;
+
+      Object.keys(INGREDIENTS).forEach(k => {
+        const cfg = INGREDIENTS[k];
+        const kg = getRecipeKg(k);
+        const inp = document.getElementById('price-' + k);
+        const raw = inp.value.trim().replace(',', '.');
+
+        inp.classList.remove('ok-field', 'err-field');
+
+        if (raw === '') {
+          allCorrect = false;
+          document.getElementById('sum-' + k).textContent = '0.00';
+          return;
+        }
+
+        const val = parseFloat(raw);
+        if (isNaN(val) || val < 0) {
+          allCorrect = false;
+          inp.classList.add('err-field');
+          document.getElementById('sum-' + k).textContent = '0.00';
+          return;
+        }
+
+        filledCount++;
+        const rowSum = val * kg;
+        total += rowSum;
+        document.getElementById('sum-' + k).textContent = rowSum.toFixed(2);
+
+        if (Math.abs(val - cfg.price) < 0.005) {
+          inp.classList.add('ok-field');
+        } else {
+          inp.classList.add('err-field');
+          allCorrect = false;
+        }
+      });
+
+      document.getElementById('total-cost').textContent = total.toFixed(2) + ' руб.';
+
+      if (allCorrect && filledCount === 5) {
+        document.getElementById('econ-msg').textContent = 'Отлично! Все цены из прайс-листа верны, расчёт по рецепту выполнен.';
+        document.getElementById('btn-econ-ok').disabled = false;
+      } else {
+        document.getElementById('econ-msg').textContent = 'Проверь цены за 1 кг в прайс-листе и учти расход по рецепту.';
+        document.getElementById('btn-econ-ok').disabled = true;
+      }
+    }
+
+    // Успех: 1 сек фон 13_office_success.jpg, затем 1 сек фон 14_victory_team.jpg, затем финальное окно
+    function finishEconStage() {
+      hideModals();
+      hidePopup();
+      setScene('assets/13_office_success.jpg');
+
+      setTimeout(() => {
+        setScene('assets/14_victory_team.jpg');
+        victoryTimer = setTimeout(() => {
+          openVictory();
+        }, 1000);
+      }, 1000);
+    }
+
+    function openVictory() {
+      hideModals();
+      setScene('assets/14_victory_team.jpg');
+      document.getElementById('modal-victory').classList.remove('hidden');
+    }
+
+    function notifyStep3() {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'questComplete', nextStep: 3, url: STEP3_URL }, '*');
+      }
+    }
+
+    function resetGame() {
+      stopPouring();
+      if (proofTimer) {
+        clearInterval(proofTimer);
+        proofTimer = null;
+      }
+      if (victoryTimer) {
+        clearTimeout(victoryTimer);
+        victoryTimer = null;
+      }
+      hideModals();
+      hideHotspots();
+      setScene('assets/01_bg_factory.jpg');
+      showBanner(
+        'Формула успеха!',
+        'На хлебозаводе запускают новую линию выпечки. Пройди путь Технолога, Инжене́ра и Экономиста, чтобы производство работало без сбоев и приносило прибыль.',
+        'Начать квест',
+        beginQuest
+      );
+    }
+  </script>
+</body>
+</html>
