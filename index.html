@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pro-BGUT</title>
   <style>
     * {
@@ -10,13 +10,11 @@
       margin: 0;
       padding: 0;
       user-select: none;
-      -webkit-tap-highlight-color: transparent;
     }
 
     html, body {
       width: 100%;
       height: 100%;
-      height: 100dvh;
       background: #1b120b;
       overflow: hidden;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -26,7 +24,6 @@
       position: relative;
       width: 100vw;
       height: 100vh;
-      height: 100dvh;
       overflow: hidden;
       background: #2b1d12;
     }
@@ -42,10 +39,10 @@
     .story-popup {
       position: absolute;
       left: 50%;
-      bottom: max(14px, 3.5%);
+      bottom: 3.5%;
       transform: translateX(-50%);
-      width: min(880px, 92%);
-      background: rgba(255, 249, 238, 0.95);
+      width: min(880px, 90%);
+      background: rgba(255, 249, 238, 0.94);
       border: 3px solid #c4884c;
       border-radius: 14px;
       padding: 16px 24px;
@@ -75,7 +72,7 @@
       }
     }
 
-    .story-header-flex {
+    .story-header-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -114,10 +111,6 @@
       white-space: nowrap;
       box-shadow: 0 4px 0 #8f3d0c;
       transition: transform 0.12s ease, background 0.2s ease;
-      touch-action: manipulation;
-    }
-
-    .btn-hold {
       touch-action: none;
     }
 
@@ -213,34 +206,32 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 14px;
+      padding: 20px;
       z-index: 25;
     }
 
     .modal-card {
-      background: rgba(255, 249, 238, 0.96);
+      background: rgba(255, 249, 238, 0.94);
       border: 3px solid #c4884c;
       border-radius: 16px;
       max-width: 880px;
       width: 100%;
-      max-height: 92dvh;
+      max-height: 90vh;
       overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      padding: 20px 24px;
+      padding: 22px 26px;
       box-shadow: 0 18px 45px rgba(0, 0, 0, 0.5);
     }
 
     .modal-card h2 {
       color: #4d290e;
       margin-bottom: 8px;
-      font-size: 1.32rem;
+      font-size: 1.35rem;
     }
 
     .modal-card p {
       color: #2c1a0c;
       line-height: 1.45;
       margin-bottom: 12px;
-      font-size: 0.96rem;
     }
 
     /* Взвешивание с удержанием */
@@ -270,7 +261,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
       transition: all 0.15s;
     }
 
@@ -366,29 +356,21 @@
       margin-top: 4px;
     }
 
-    .circuit-wrapper {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
     .circuit-grid {
       display: grid;
-      grid-template-columns: repeat(5, 56px);
+      grid-template-columns: repeat(5, 58px);
       gap: 6px;
       background: #2b3036;
-      padding: 12px;
+      padding: 14px;
       border-radius: 12px;
       border: 3px solid #59626d;
-      margin: 8px auto;
+      margin: 12px auto;
       width: fit-content;
     }
 
     .tile {
-      width: 56px;
-      height: 56px;
+      width: 58px;
+      height: 58px;
       background: #3d444d;
       border-radius: 8px;
       border: 2px solid #5a636e;
@@ -422,17 +404,11 @@
       padding: 14px;
     }
 
-    .table-scroll {
-      width: 100%;
-      overflow-x: auto;
-    }
-
     .excel-table {
       width: 100%;
       border-collapse: collapse;
       background: #fff;
       font-size: 0.88rem;
-      min-width: 310px;
     }
 
     .excel-table th {
@@ -449,12 +425,11 @@
     }
 
     .price-input {
-      width: 76px;
-      padding: 5px 6px;
+      width: 78px;
+      padding: 4px 6px;
       border: 2px solid #217346;
-      border-radius: 6px;
+      border-radius: 4px;
       font-weight: 700;
-      font-size: 0.9rem;
       background: #f0fff6;
     }
 
@@ -468,102 +443,14 @@
       background: #fff1ee;
     }
 
-    .victory-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 16px;
-    }
-
     @media (max-width: 780px) {
-      .weigh-layout,
-      .econ-grid {
+      .weigh-layout, .econ-grid, .story-popup, .story-header-row {
         grid-template-columns: 1fr;
-      }
-
-      .story-popup {
-        width: 94%;
-        padding: 13px 15px;
-        bottom: max(10px, 2.5%);
-        gap: 12px;
-      }
-
-      .story-header-flex {
         flex-direction: column;
-        align-items: stretch;
         text-align: center;
-        gap: 12px;
       }
-
-      .story-text h2 {
-        font-size: 1.1rem;
-      }
-
-      .story-text p {
-        font-size: 0.9rem;
-      }
-
-      .story-text p.large-banner-text {
-        font-size: 1.25rem;
-      }
-
-      .modal-card {
-        padding: 15px 14px;
-        border-radius: 14px;
-      }
-
-      .modal-card h2 {
-        font-size: 1.15rem;
-      }
-
-      .btn {
-        width: 100%;
-        padding: 10px 16px;
-        font-size: 0.92rem;
-      }
-
-      .weigh-station .btn {
-        width: auto;
-        flex: 1 1 auto;
-      }
-
-      .knead-bottom-row,
-      .proof-ready-row {
+      .knead-bottom-row, .proof-ready-row {
         flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-      }
-
-      #knead-percent {
-        text-align: center !important;
-      }
-
-      .circuit-grid {
-        grid-template-columns: repeat(5, 46px);
-        gap: 4px;
-        padding: 8px;
-      }
-
-      .tile {
-        width: 46px;
-        height: 46px;
-      }
-
-      .tile svg {
-        width: 38px !important;
-        height: 38px !important;
-      }
-
-      .hotspot-ring {
-        width: 48px;
-        height: 48px;
-        font-size: 1.25rem;
-      }
-
-      .hotspot-label {
-        font-size: 0.78rem;
-        padding: 3px 9px;
       }
     }
   </style>
@@ -592,7 +479,7 @@
 
     <!-- Всплывающий блок внизу экрана -->
     <div id="story-popup" class="story-popup">
-      <div id="story-header-row" class="story-header-flex">
+      <div id="story-header-row" class="story-header-row">
         <div class="story-text">
           <h2 id="story-title">Формула успеха!</h2>
           <p id="story-desc">
@@ -681,7 +568,7 @@
             <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
               <button
                 id="btn-hold-pour"
-                class="btn btn-hold"
+                class="btn"
                 disabled
                 onpointerdown="startPouring(event)"
                 onpointerup="stopPouring()"
@@ -717,7 +604,7 @@
       <div class="modal-card" style="text-align:center;">
         <h2>⚡ Щиток управления печи</h2>
         <p>Поворачивай плитки с проводами, чтобы соединить <strong>Ввод 380В</strong> слева с <strong>Печью</strong> справа.</p>
-        <div class="circuit-wrapper">
+        <div style="display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;">
           <div style="background:#d96b27; color:#fff; padding:8px 12px; border-radius:8px; font-weight:700;">⚡ Ввод 380В</div>
           <div id="circuit-grid" class="circuit-grid"></div>
           <div id="badge-oven" style="background:#555; color:#fff; padding:8px 12px; border-radius:8px; font-weight:700;">🔥 Печь</div>
@@ -739,7 +626,7 @@
             <p style="font-size:0.9rem; margin-bottom:6px;"><strong>Соль пищевая:</strong> 0.44 руб./кг</p>
             <p style="font-size:0.9rem; margin-bottom:0;"><strong>Сахар-песок:</strong> 2.45 руб./кг</p>
           </div>
-          <div class="table-scroll">
+          <div>
             <table class="excel-table">
               <thead>
                 <tr>
@@ -753,31 +640,31 @@
                 <tr>
                   <td><strong>Мука</strong></td>
                   <td id="recipe-qty-flour">0.500 кг</td>
-                  <td><input type="number" step="0.01" inputmode="decimal" id="price-flour" class="price-input" placeholder="0.00" oninput="calcEcon()" /></td>
+                  <td><input type="number" step="0.01" id="price-flour" class="price-input" placeholder="0.00" oninput="calcEcon()" /></td>
                   <td id="sum-flour">0.00</td>
                 </tr>
                 <tr>
                   <td><strong>Вода</strong></td>
                   <td id="recipe-qty-water">0.300 кг</td>
-                  <td><input type="number" step="0.01" inputmode="decimal" id="price-water" class="price-input" placeholder="0.00" oninput="calcEcon()" /></td>
+                  <td><input type="number" step="0.01" id="price-water" class="price-input" placeholder="0.00" oninput="calcEcon()" /></td>
                   <td id="sum-water">0.00</td>
                 </tr>
                 <tr>
                   <td><strong>Дрожжи</strong></td>
                   <td id="recipe-qty-yeast">0.010 кг</td>
-                  <td><input type="number" step="0.01" inputmode="decimal" id="price-yeast" class="price-input" placeholder="0.00" oninput="calcEcon()" /></td>
+                  <td><input type="number" step="0.01" id="price-yeast" class="price-input" placeholder="0.00" oninput="calcEcon()" /></td>
                   <td id="sum-yeast">0.00</td>
                 </tr>
                 <tr>
                   <td><strong>Соль</strong></td>
                   <td id="recipe-qty-salt">0.010 кг</td>
-                  <td><input type="number" step="0.01" inputmode="decimal" id="price-salt" class="price-input" placeholder="0.00" oninput="calcEcon()" /></td>
+                  <td><input type="number" step="0.01" id="price-salt" class="price-input" placeholder="0.00" oninput="calcEcon()" /></td>
                   <td id="sum-salt">0.00</td>
                 </tr>
                 <tr>
                   <td><strong>Сахар</strong></td>
                   <td id="recipe-qty-sugar">0.010 кг</td>
-                  <td><input type="number" step="0.01" inputmode="decimal" id="price-sugar" class="price-input" placeholder="0.00" oninput="calcEcon()" /></td>
+                  <td><input type="number" step="0.01" id="price-sugar" class="price-input" placeholder="0.00" oninput="calcEcon()" /></td>
                   <td id="sum-sugar">0.00</td>
                 </tr>
                 <tr style="background:#e3f7eb; font-weight:700;">
@@ -799,19 +686,12 @@
 
     <!-- Финальный экран -->
     <div id="modal-victory" class="modal-layer hidden">
-      <div class="modal-card" style="text-align:center; max-width:580px;">
+      <div class="modal-card" style="text-align:center; max-width:600px;">
         <h2>🍞 Миссия успешно завершена!</h2>
         <p>Хлебозавод работает на полную мощность, новая линия выпечки запущена.</p>
-
-        <div class="victory-actions">
+        <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:16px;">
           <button class="btn" onclick="resetGame()">Пройти заново</button>
-          <a
-            class="btn btn-step3"
-            href="https://nvhol.github.io/Pro-BGUT/testdrive.html"
-            onclick="notifyStep3()"
-          >
-            Перейти на шаг 3
-          </a>
+          <a class="btn btn-step3" href="https://nvhol.github.io/Pro-BGUT/testdrive.html" onclick="goStep3()">Перейти на шаг 3</a>
         </div>
       </div>
     </div>
@@ -821,7 +701,6 @@
     const STEP3_URL = 'https://nvhol.github.io/Pro-BGUT/testdrive.html';
     const sceneImg = document.getElementById('scene-image');
     let proofTimer = null;
-    let victoryTimer = null;
 
     function setScene(path) {
       sceneImg.src = path;
@@ -1129,7 +1008,7 @@
       );
     }
 
-    // Щиток управления печи
+    // Этап 2: Щиток управления
     const INIT_CIRCUIT = [
       [
         { type: 'straight', rot: 0, fixed: true },
@@ -1272,6 +1151,7 @@
       );
     }
 
+    // При клике на маркер: 1 сек фон 11_pricelist_closeup.jpg, затем 12_computer_excel.jpg и мини-игра
     function openEconomistIntro() {
       hideHotspots();
       hidePopup();
@@ -1354,17 +1234,13 @@
       }
     }
 
-    // Успех: 1 сек фон 13_office_success.jpg, затем 1 сек фон 14_victory_team.jpg, затем финальное окно
+    // Успех: 1 сек фон 13_office_success.jpg, затем финальный экран 14_victory_team.jpg
     function finishEconStage() {
       hideModals();
-      hidePopup();
       setScene('assets/13_office_success.jpg');
 
       setTimeout(() => {
-        setScene('assets/14_victory_team.jpg');
-        victoryTimer = setTimeout(() => {
-          openVictory();
-        }, 1000);
+        openVictory();
       }, 1000);
     }
 
@@ -1374,7 +1250,7 @@
       document.getElementById('modal-victory').classList.remove('hidden');
     }
 
-    function notifyStep3() {
+    function goStep3() {
       if (window.parent && window.parent !== window) {
         window.parent.postMessage({ type: 'questComplete', nextStep: 3, url: STEP3_URL }, '*');
       }
@@ -1385,10 +1261,6 @@
       if (proofTimer) {
         clearInterval(proofTimer);
         proofTimer = null;
-      }
-      if (victoryTimer) {
-        clearTimeout(victoryTimer);
-        victoryTimer = null;
       }
       hideModals();
       hideHotspots();
