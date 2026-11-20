@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pro-BGUT</title>
 
-  <!-- Предзагрузка фонов для быстрого переключения (как в b2b.txt) -->
+  <!-- Предзагрузка фонов для быстрого переключения -->
   <link rel="preload" href="assets/01_bg_factory.jpg" as="image" />
   <link rel="preload" href="assets/02_table_book_closed.jpg" as="image" />
   <link rel="preload" href="assets/03_book_open.jpg" as="image" />
@@ -27,6 +27,8 @@
       margin: 0;
       padding: 0;
       user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
     }
 
     /* По умолчанию для компьютера — без прокрутки */
@@ -51,9 +53,11 @@
       height: 100%;
       object-fit: cover;
       display: block;
+      pointer-events: none;
+      -webkit-user-drag: none;
     }
 
-    /* Предупреждение о портретной ориентации на мобильных (как в b2b.txt) */
+    /* Экран предупреждения о портретной ориентации на мобильных */
     #orientation-warning {
       position: fixed;
       top: 0;
@@ -160,6 +164,7 @@
       box-shadow: 0 4px 0 #8f3d0c;
       transition: transform 0.12s ease, background 0.2s ease;
       touch-action: none;
+      -webkit-touch-callout: none;
     }
 
     .btn:hover:not(:disabled) {
@@ -487,6 +492,8 @@
       border-radius: 4px;
       font-weight: 700;
       background: #f0fff6;
+      user-select: text;
+      -webkit-user-select: text;
     }
 
     .price-input.ok-field {
@@ -499,7 +506,7 @@
       background: #fff1ee;
     }
 
-    /* Адаптация ТОЛЬКО для телефонов в горизонтальном режиме (как в b2b.txt) */
+    /* Адаптация ТОЛЬКО для телефонов в горизонтальном режиме */
     @media (max-height: 500px) {
       html, body {
         overflow-y: auto;
@@ -638,7 +645,7 @@
   </div>
 
   <div class="stage-viewport">
-    <img id="scene-image" class="scene-bg" src="assets/01_bg_factory.jpg" alt="Сцена хлебозавода" />
+    <img id="scene-image" class="scene-bg" src="assets/01_bg_factory.jpg" alt="" draggable="false" />
 
     <!-- Маркер книги на столе -->
     <div id="hotspot-book" class="hotspot hidden" style="left: 48%; top: 64%;" onclick="triggerBookSequence()">
@@ -880,7 +887,14 @@
   </div>
 
   <script>
-    // Проверка ориентации экрана для мобильных устройств (как в b2b.txt)
+    // Блокируем стандартное меню браузера при долгом нажатии
+    document.addEventListener('contextmenu', function (e) {
+      if (!e.target.closest('input, textarea')) {
+        e.preventDefault();
+      }
+    });
+
+    // Проверка ориентации экрана для мобильных устройств
     function checkOrientation() {
       const warning = document.getElementById('orientation-warning');
       if (window.innerWidth < 900 && window.innerHeight > window.innerWidth) {
@@ -892,6 +906,11 @@
 
     window.addEventListener('resize', checkOrientation);
     window.addEventListener('DOMContentLoaded', checkOrientation);
+    window.addEventListener('blur', () => {
+      if (typeof stopPouring === 'function') {
+        stopPouring();
+      }
+    });
 
     const STEP3_URL = 'https://nvhol.github.io/Pro-BGUT/testdrive.html';
     const sceneImg = document.getElementById('scene-image');
