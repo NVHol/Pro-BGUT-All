@@ -35,6 +35,33 @@
       display: block;
     }
 
+    /* Экран предупреждения о портретной ориентации на мобильных */
+    #orientation-warning {
+      position: fixed;
+      inset: 0;
+      background: rgba(27, 18, 11, 0.96);
+      z-index: 1000;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      color: #fff9ee;
+    }
+
+    .rotate-icon {
+      font-size: 3.5rem;
+      margin-bottom: 14px;
+      animation: rotatePhone 2s infinite ease-in-out;
+    }
+
+    @keyframes rotatePhone {
+      0% { transform: rotate(0deg); }
+      50% { transform: rotate(90deg); }
+      100% { transform: rotate(0deg); }
+    }
+
     /* Сюжетный блок / подсказка внизу экрана */
     .story-popup {
       position: absolute;
@@ -149,6 +176,14 @@
 
     .btn-step3:hover:not(:disabled) {
       background: #175a87;
+    }
+
+    .portrait-hint {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #2e8b57;
+      text-align: center;
     }
 
     .hidden {
@@ -443,19 +478,134 @@
       background: #fff1ee;
     }
 
-    @media (max-width: 780px) {
-      .weigh-layout, .econ-grid, .story-popup, .story-header-row {
-        grid-template-columns: 1fr;
-        flex-direction: column;
-        text-align: center;
+    /* Адаптация для телефонов в горизонтальном режиме */
+    @media (max-height: 500px) {
+      .story-popup {
+        padding: 8px 14px;
+        bottom: 2%;
+        gap: 10px;
+        border-radius: 10px;
       }
-      .knead-bottom-row, .proof-ready-row {
-        flex-direction: column;
+      .story-text h2 {
+        font-size: 0.95rem;
+        margin-bottom: 2px;
+      }
+      .story-text p {
+        font-size: 0.78rem;
+        line-height: 1.25;
+      }
+      .story-text p.large-banner-text {
+        font-size: 1.1rem;
+      }
+      .btn {
+        padding: 6px 14px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+      }
+      .hotspot-ring {
+        width: 42px;
+        height: 42px;
+        font-size: 1.1rem;
+      }
+      .hotspot-label {
+        font-size: 0.72rem;
+        padding: 2px 8px;
+      }
+      .modal-layer {
+        padding: 8px;
+      }
+      .modal-card {
+        padding: 10px 14px;
+        max-height: 94vh;
+        border-radius: 12px;
+      }
+      .modal-card h2 {
+        font-size: 0.98rem;
+        margin-bottom: 4px;
+      }
+      .modal-card p {
+        font-size: 0.75rem;
+        line-height: 1.25;
+        margin-bottom: 6px;
+      }
+      .weigh-layout, .econ-grid {
+        gap: 8px;
+      }
+      .ing-select-list {
+        gap: 4px;
+      }
+      .ing-choice {
+        padding: 5px 8px;
+        font-size: 0.76rem;
+        border-radius: 7px;
+      }
+      .weigh-station, .pricelist-box {
+        padding: 8px;
+      }
+      .scale-digital {
+        font-size: 1.1rem;
+        padding: 6px;
+        margin-bottom: 6px;
+      }
+      .dose-bar-wrap {
+        height: 14px;
+        margin: 6px 0 8px;
+      }
+      .bowl-summary {
+        margin-top: 6px;
+        padding-top: 6px;
+        font-size: 0.75rem;
+      }
+      .circuit-grid {
+        grid-template-columns: repeat(5, 40px);
+        gap: 3px;
+        padding: 6px;
+        margin: 6px auto;
+      }
+      .tile {
+        width: 40px;
+        height: 40px;
+      }
+      .tile svg {
+        width: 32px !important;
+        height: 32px !important;
+      }
+      .excel-table {
+        font-size: 0.74rem;
+      }
+      .excel-table th, .excel-table td {
+        padding: 3px 5px;
+      }
+      .price-input {
+        width: 62px;
+        padding: 2px 4px;
+        font-size: 0.75rem;
+      }
+      .pricelist-box p {
+        font-size: 0.72rem !important;
+        margin-bottom: 3px !important;
+      }
+      #econ-msg {
+        font-size: 0.74rem !important;
+        margin-top: 4px !important;
+      }
+      .portrait-hint {
+        margin-top: 8px;
+        font-size: 0.74rem;
       }
     }
   </style>
 </head>
 <body>
+  <!-- Экран предупреждения о портретной ориентации на мобильных -->
+  <div id="orientation-warning">
+    <div class="rotate-icon">📱🔄</div>
+    <h2 style="margin-bottom: 10px;">Пожалуйста, поверните устройство</h2>
+    <p style="font-size: 0.95rem; max-width: 360px; line-height: 1.4;">
+      Для прохождения квеста и комфортной игры расположите экран телефона горизонтально.
+    </p>
+  </div>
+
   <div class="stage-viewport">
     <img id="scene-image" class="scene-bg" src="assets/01_bg_factory.jpg" alt="Сцена хлебозавода" />
 
@@ -689,7 +839,8 @@
       <div class="modal-card" style="text-align:center; max-width:600px;">
         <h2>🍞 Миссия успешно завершена!</h2>
         <p>Хлебозавод работает на полную мощность, новая линия выпечки запущена.</p>
-        <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:16px;">
+        <p class="portrait-hint">📱 Поверните телефон вертикально для комфортного просмотра Шага 3</p>
+        <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:12px;">
           <button class="btn" onclick="resetGame()">Пройти заново</button>
           <a class="btn btn-step3" href="https://nvhol.github.io/Pro-BGUT/testdrive.html" onclick="goStep3()">Перейти на шаг 3</a>
         </div>
@@ -698,6 +849,18 @@
   </div>
 
   <script>
+    function checkOrientation() {
+      const warning = document.getElementById('orientation-warning');
+      if (window.innerWidth < 900 && window.innerHeight > window.innerWidth) {
+        warning.style.display = 'flex';
+      } else {
+        warning.style.display = 'none';
+      }
+    }
+
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('DOMContentLoaded', checkOrientation);
+
     const STEP3_URL = 'https://nvhol.github.io/Pro-BGUT/testdrive.html';
     const sceneImg = document.getElementById('scene-image');
     let proofTimer = null;
