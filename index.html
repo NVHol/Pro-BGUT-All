@@ -478,11 +478,28 @@
       background: #fff1ee;
     }
 
-    /* Адаптация для телефонов в горизонтальном режиме */
+    /* Адаптация ТОЛЬКО для телефонов в горизонтальном режиме (как в b2b.txt) */
     @media (max-height: 500px) {
+      html, body {
+        overflow-y: auto;
+        overflow-x: hidden;
+        height: auto;
+        min-height: 100vh;
+      }
+      .stage-viewport {
+        height: 82vh;
+        min-height: 320px;
+        overflow: visible;
+      }
       .story-popup {
+        position: relative;
+        left: auto;
+        bottom: auto;
+        transform: none;
+        animation: none;
+        width: 94%;
+        margin: 8px auto 14px;
         padding: 8px 14px;
-        bottom: 2%;
         gap: 10px;
         border-radius: 10px;
       }
@@ -512,11 +529,13 @@
         padding: 2px 8px;
       }
       .modal-layer {
+        position: fixed;
         padding: 8px;
+        overflow-y: auto;
       }
       .modal-card {
         padding: 10px 14px;
-        max-height: 94vh;
+        max-height: 92vh;
         border-radius: 12px;
       }
       .modal-card h2 {
