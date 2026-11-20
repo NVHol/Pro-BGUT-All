@@ -4,6 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pro-BGUT</title>
+
+  <!-- Предзагрузка фонов для быстрого переключения (как в b2b.txt) -->
+  <link rel="preload" href="assets/01_bg_factory.jpg" as="image" />
+  <link rel="preload" href="assets/02_table_book_closed.jpg" as="image" />
+  <link rel="preload" href="assets/03_book_open.jpg" as="image" />
+  <link rel="preload" href="assets/04_scales_ingredients.jpg" as="image" />
+  <link rel="preload" href="assets/05_kneading_dough.jpg" as="image" />
+  <link rel="preload" href="assets/06_proofing_dough.jpg" as="image" />
+  <link rel="preload" href="assets/07_modern_oven_broken.jpg" as="image" />
+  <link rel="preload" href="assets/08_panel_closeup.jpg" as="image" />
+  <link rel="preload" href="assets/09_modern_oven_working.jpg" as="image" />
+  <link rel="preload" href="assets/10_director_office.jpg" as="image" />
+  <link rel="preload" href="assets/11_pricelist_closeup.jpg" as="image" />
+  <link rel="preload" href="assets/12_computer_excel.jpg" as="image" />
+  <link rel="preload" href="assets/13_office_success.jpg" as="image" />
+  <link rel="preload" href="assets/14_victory_team.jpg" as="image" />
+
   <style>
     * {
       box-sizing: border-box;
@@ -12,6 +29,7 @@
       user-select: none;
     }
 
+    /* По умолчанию для компьютера — без прокрутки */
     html, body {
       width: 100%;
       height: 100%;
@@ -35,11 +53,14 @@
       display: block;
     }
 
-    /* Экран предупреждения о портретной ориентации на мобильных */
+    /* Предупреждение о портретной ориентации на мобильных (как в b2b.txt) */
     #orientation-warning {
       position: fixed;
-      inset: 0;
-      background: rgba(27, 18, 11, 0.96);
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(27, 18, 11, 0.95);
       z-index: 1000;
       display: none;
       flex-direction: column;
@@ -51,8 +72,8 @@
     }
 
     .rotate-icon {
-      font-size: 3.5rem;
-      margin-bottom: 14px;
+      font-size: 4rem;
+      margin-bottom: 20px;
       animation: rotatePhone 2s infinite ease-in-out;
     }
 
@@ -488,18 +509,11 @@
       }
       .stage-viewport {
         height: 82vh;
-        min-height: 320px;
-        overflow: visible;
+        min-height: 400px;
       }
       .story-popup {
-        position: relative;
-        left: auto;
-        bottom: auto;
-        transform: none;
-        animation: none;
-        width: 94%;
-        margin: 8px auto 14px;
         padding: 8px 14px;
+        bottom: 2%;
         gap: 10px;
         border-radius: 10px;
       }
@@ -508,7 +522,7 @@
         margin-bottom: 2px;
       }
       .story-text p {
-        font-size: 0.78rem;
+        font-size: 0.8rem;
         line-height: 1.25;
       }
       .story-text p.large-banner-text {
@@ -516,7 +530,7 @@
       }
       .btn {
         padding: 6px 14px;
-        font-size: 0.8rem;
+        font-size: 0.78rem;
         border-radius: 8px;
       }
       .hotspot-ring {
@@ -529,17 +543,15 @@
         padding: 2px 8px;
       }
       .modal-layer {
-        position: fixed;
         padding: 8px;
-        overflow-y: auto;
       }
       .modal-card {
         padding: 10px 14px;
-        max-height: 92vh;
+        max-height: 85vh;
         border-radius: 12px;
       }
       .modal-card h2 {
-        font-size: 0.98rem;
+        font-size: 0.95rem;
         margin-bottom: 4px;
       }
       .modal-card p {
@@ -555,7 +567,7 @@
       }
       .ing-choice {
         padding: 5px 8px;
-        font-size: 0.76rem;
+        font-size: 0.75rem;
         border-radius: 7px;
       }
       .weigh-station, .pricelist-box {
@@ -616,7 +628,7 @@
   </style>
 </head>
 <body>
-  <!-- Экран предупреждения о портретной ориентации на мобильных -->
+  <!-- Экран предупреждения о повороте телефона -->
   <div id="orientation-warning">
     <div class="rotate-icon">📱🔄</div>
     <h2 style="margin-bottom: 10px;">Пожалуйста, поверните устройство</h2>
@@ -868,6 +880,7 @@
   </div>
 
   <script>
+    // Проверка ориентации экрана для мобильных устройств (как в b2b.txt)
     function checkOrientation() {
       const warning = document.getElementById('orientation-warning');
       if (window.innerWidth < 900 && window.innerHeight > window.innerWidth) {
